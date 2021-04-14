@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Contact{% endblock %}
+{% block contact %} active {% endblock %}
+{% block body %}
+<div class="container">
+    <h3>Contact to Admin</h3>
+    <form action="/contact" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" name="name" id="name" aria-describedby="name">
+
+            <label for="email">Email Address</label>
+            <input type="email" class="form-control" name="email" id="email" aria-describedby="email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="number">Phone Number</label>
+            <input type="number" class="form-control" name="phone" id="number">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Describe your issue :</label>
+            <textarea class="form-control" name="content" id="content" cols="30" rows="5"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

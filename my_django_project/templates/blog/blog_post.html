@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}BLOG_POST{% endblock %}
+{% block blog_post %}active{% endblock %}
+{% block body %}
+{% load humanize %}
+{#{% load extras %}#}
+{% load extras %}
+
+
+
+<div class="container my-3">
+    <div class="blog-post">
+        <h2 class="blog-post-title">{{post.Title}}</h2>
+        <p class="blog-post-meta">{{post.Timestamp}} by <a href="#">{{post.Author}}</a></p>
+        <p>{{post.Content}}</p>
+        <hr>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Comments ({{ comments.count }})</h1>
+    {% if user.is_authenticated %}
+    <form action="/blog/post_comment" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="comment"><b>Post Comment</b></label>
+            <input type="text" class="form-control" name="comment" placeholder="Enter your comment here">
+        </div>
+        <input type="hidden" name="post_sno" value="{{post.Serial_no}}">
+        <input type="hidden" name="parent_sno" value="">
+        <button type="submit" class="btn btn-primary">Post</button>
+    </form>
+    {% else %}
+    <p>
+    <h6>Please login for posting comments</h6>
+    </p>
+    {% endif %}
+    {% for i in comments %}
+    <div class="row my-3 ">
+        <div class="col-md-1">
+            <img class="rounded mx-auto d-block w-100" src="/static/image/user.png" alt="pic">
+        </div>
+        <div class="col-md-11">
+            <div><b>{{ i.user }}</b> <span class="badge badge-secondary">{{ i.Time_stamp| naturaltime }}</span></div>
+            <div>{{ i.Comment }}</div>
+            <div class="reply">
+                {% if user.is_authenticated %}
+                <a class="btn btn-primary" data-toggle="collapse" href="#reply{{ i.Serial_no }}" role="button"
+                    aria-expanded="false" aria-controls="reply">
+                    Reply
+                </a>
+
+                <div class="collapse" id="reply{{ i.Serial_no }}">
+                    <div class="card card-body">
+                        <form action="/blog/post_comment" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="comment"><b>Post Reply</b></label>
+                                <input type="text" class="form-control" name="comment"
+                                    placeholder="Enter your comment here">
+                                <input type="hidden" name="parent_sno" value="{{ i.Serial_no }}">
+                            </div>
+                            <input type="hidden" name="post_sno" value="{{ post.Serial_no }}">
+                            <button type="submit" class="btn btn-primary">Post</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <button class="btn btn-sm btn-primary" type="button" data-toggle="collapse"
+                    data-target="#reply{{i.Serial_no}}" aria-expanded="false"
+                    aria-controls="reply{{i.Serial_no}} disabled">
+                    Login to reply
+                </button>
+                {% endif %}
+                <div class="replies my-2">
+
+                    {% for reply in reply_dict|get_val:i.Serial_no %}
+                    <div class="row my-2 ">
+                        <div class="col-md-1">
+                            <img class="rounded mx-auto d-block w-100 p-2" src="/static/image/user.png" alt="pic">
+                        </div>
+                        <div class="col-md-11">
+                            <div><b>{{ reply.user }}</b> <span class="badge badge-secondary">{{ reply.Time_stamp|naturaltime }}</span></div>
+                            <div>{{ reply.Comment }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
